@@ -10,7 +10,7 @@ class CurrenciesController{
     getCurrencies = async (req, res)  => {
         res
             .status(200)
-            .send(await this.service.getCurrencies())
+            .send(await this.service.getCurrenciesTable())
     }
 }
 

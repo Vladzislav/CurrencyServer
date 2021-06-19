@@ -1,21 +1,9 @@
 request = require('request-promise')
 const fs = require("fs")
 
-function currCalc(curAbbreviation, curQuantity, curTable) {
-    const mainCurRate = curTableBYN.find(currency => {
-        return currency['curAbbreviation'] === 'USD';
-    })['curRate'];
-    const curTableUSD = curTableBYN.map(currency => {
-        const currentCurrencyRate = currency['curRate'];
-        currency['curRate'] = (1*mainCurRate/currentCurrencyRate).toFixed(4);
-        return currency;
-    })
-}
-
 
 class CurrenciesService {
-    getCurrencies = async () => {
-
+    getCurrenciesTable = async () => {
         const currencies = await request({uri: 'https://www.nbrb.by/API/ExRates/Rates?Periodicity=0&parammode=2', method: 'GET'});
         const currenciesNames = await request({uri: 'https://raw.githubusercontent.com/unicode-cldr/cldr-numbers-modern/master/main/ru/currencies.json', method: 'GET'});
 
@@ -24,46 +12,37 @@ class CurrenciesService {
                 let curName = JSON.parse(currenciesNames)['main']['ru']['numbers']['currencies'][currency['Cur_Abbreviation']]['displayName'];
                 curName = curName[0].toUpperCase() + curName.slice(1);
 
-                return {curAbbreviation: currency['Cur_Abbreviation'], curName, curRate: (currency['Cur_OfficialRate']/currency['Cur_Scale']).toFixed(4)};
+                return {curAbbreviation: currency['Cur_Abbreviation'],
+                    curName,
+                    curRate: (currency['Cur_OfficialRate']/currency['Cur_Scale']).toFixed(4)};
+                    // curRate: (currency['Cur_OfficialRate']/currency['Cur_Scale'])};
             }
             else{
-                return {curAbbreviation: currency['Cur_Abbreviation'], curName: currency['Cur_Name'], curRate: currency['Cur_OfficialRate'].toFixed(4)};
+                return {curAbbreviation: currency['Cur_Abbreviation'],
+                    curName: currency['Cur_Name'],
+                    curRate: currency['Cur_OfficialRate'].toFixed(4)};
             }
         })
-
         curTableBYN.push({curAbbreviation:'BYN', curName: 'Белорусский рубль', curRate: 1});
 
-        fs.writeFileSync("currenciesTable.json", JSON.stringify(curTableBYN), 'utf-8')
+        fs.writeFileSync("currenciesTable.json", JSON.stringify(curTableBYN), 'utf-8');
 
-        // currCalc();
+        return this.recountCurrencies('USD', 1);
 
-        //
-        const mainCurRate = curTableBYN.find(currency => {
-            return currency['curAbbreviation'] === 'USD';
-        })['curRate'];
-        const curTableUSD = curTableBYN.map(currency => {
-            const currentCurrencyRate = currency['curRate'];
-            currency['curRate'] = (1*mainCurRate/currentCurrencyRate).toFixed(4);
-            return currency;
-        })
-        //
-        this.recountCurrencies()
-        return curTableUSD;
     }
 
-    recountCurrencies = (req) => {
+    recountCurrencies = (curAbbreviation, curQuantity) => {
         const curTable = JSON.parse(fs.readFileSync("currenciesTable.json", "utf-8"))
 
         const mainCurRate = curTable.find(currency => {
-            return currency['curAbbreviation'] === req.body['curAbbreviation'];
+            return currency['curAbbreviation'] === curAbbreviation;
         })['curRate'];
 
-        const curTableResult = curTable.map(currency => {
+        return curTable.map(currency => {
             const currentCurrencyRate = currency['curRate'];
-            currency['curRate'] = (req.body['curQuantity']*mainCurRate/currentCurrencyRate).toFixed(4);
+            currency['curRate'] = parseFloat((curQuantity*mainCurRate/currentCurrencyRate).toFixed(4));
             return currency;
         })
-        return curTableResult;
     }
 }
 

@@ -1,11 +1,12 @@
 request = require('request-promise')
 const fs = require("fs")
+require('dotenv').config()
 
 
 class CurrenciesService {
     getCurrenciesTable = async () => {
-        const currencies = await request({uri: 'https://www.nbrb.by/API/ExRates/Rates?Periodicity=0&parammode=2', method: 'GET'});
-        const currenciesNames = await request({uri: 'https://raw.githubusercontent.com/unicode-cldr/cldr-numbers-modern/master/main/ru/currencies.json', method: 'GET'});
+        const currencies = await request({uri: process.env.CURRENCIES_LINK, method: 'GET'});
+        const currenciesNames = await request({uri: process.env.CURRENCIES_NAMES_LINK, method: 'GET'});
 
         const curTableBYN = JSON.parse(currencies).map(currency => {
             if(currency['Cur_Scale'] !== 1) {

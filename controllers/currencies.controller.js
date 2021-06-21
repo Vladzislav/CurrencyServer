@@ -10,7 +10,7 @@ class CurrenciesController{
     getCurrencies = async (req, res)  => {
         res
             .status(200)
-            .send(await this.service.getCurrenciesTable())
+            .send(await this.service.getCurrenciesTable(req.body.list))
     }
     recountCurrencies = (req, res) => {
         res

@@ -4,8 +4,8 @@ const controller = require('../controllers/currencies.controller');
 
 
 router
-    .get('/', controller.getCurrencies)
-    .put('/', controller.recountCurrencies)
+    .put('/list', controller.getCurrencies)
+    .put('/recount', controller.recountCurrencies)
 
 
 module.exports = router;

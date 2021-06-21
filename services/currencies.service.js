@@ -4,7 +4,7 @@ require('dotenv').config()
 
 
 class CurrenciesService {
-    getCurrenciesTable = async () => {
+    getCurrenciesTable = async (list) => {
         const currencies = await request({uri: process.env.CURRENCIES_LINK, method: 'GET'});
         const currenciesNames = await request({uri: process.env.CURRENCIES_NAMES_LINK, method: 'GET'});
 

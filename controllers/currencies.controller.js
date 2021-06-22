@@ -1,9 +1,6 @@
 const currenciesService = require('../services/currencies.service')
 
 class CurrenciesController{
-    constructor() {
-        // this.get = this.get.bind(this)
-    }
 
     service = currenciesService;
 
@@ -15,7 +12,7 @@ class CurrenciesController{
     recountCurrencies = (req, res) => {
         res
             .status(200)
-            .send(this.service.recountCurrencies(req.body['curAbbreviation'], req.body['curQuantity']))
+            .send(this.service.recountCurrencies(req.body['curAbbreviation'], req.body['curQuantity'], req.body.list))
     }
 }
 

@@ -16,7 +16,6 @@ class CurrenciesService {
                 return {curAbbreviation: currency['Cur_Abbreviation'],
                     curName,
                     curRate: (currency['Cur_OfficialRate']/currency['Cur_Scale']).toFixed(4)};
-                    // curRate: (currency['Cur_OfficialRate']/currency['Cur_Scale'])};
             }
             else{
                 return {curAbbreviation: currency['Cur_Abbreviation'],
@@ -28,22 +27,35 @@ class CurrenciesService {
 
         fs.writeFileSync("currenciesTable.json", JSON.stringify(curTableBYN), 'utf-8');
 
-        return this.recountCurrencies('USD', 1);
+        return this.recountCurrencies('USD', 1, list)
 
     }
 
-    recountCurrencies = (curAbbreviation, curQuantity) => {
+    recountCurrencies = (curAbbreviation, curQuantity, list) => {
         const curTable = JSON.parse(fs.readFileSync("currenciesTable.json", "utf-8"))
 
         const mainCurRate = curTable.find(currency => {
             return currency['curAbbreviation'] === curAbbreviation;
         })['curRate'];
 
-        return curTable.map(currency => {
+        return this.currenciesFilter(curTable.map(currency => {
             const currentCurrencyRate = currency['curRate'];
             currency['curRate'] = parseFloat((curQuantity*mainCurRate/currentCurrencyRate).toFixed(4));
             return currency;
-        })
+        }), list)
+    }
+
+    currenciesFilter = (table, list) => {
+        return  {
+            currencies: list.map(abbr =>{
+                return table.filter(currency => {
+                    return currency.curAbbreviation === abbr
+                })[0]
+        }),
+            abbrList: table.map(el => (el.curAbbreviation)).filter(currency => {
+                return list.indexOf(currency) === -1
+            })
+        }
     }
 }
 

@@ -38,7 +38,7 @@ class CurrenciesService {
             return currency['curAbbreviation'] === curAbbreviation;
         })['curRate'];
 
-        return this.currenciesFilter(curTable.map(currency => {
+         return  this.currenciesFilter(curTable.map(currency => {
             const currentCurrencyRate = currency['curRate'];
             currency['curRate'] = parseFloat((curQuantity*mainCurRate/currentCurrencyRate).toFixed(4));
             return currency;
@@ -52,9 +52,11 @@ class CurrenciesService {
                     return currency.curAbbreviation === abbr
                 })[0]
         }),
-            abbrList: table.map(el => (el.curAbbreviation)).filter(currency => {
-                return list.indexOf(currency) === -1
+            abbrList: table.map(el => ({curAbbreviation: el.curAbbreviation,
+                curName: el.curName})).filter(currency => {
+                return list.indexOf(currency.curAbbreviation) === -1
             })
+
         }
     }
 }
